@@ -1,0 +1,10 @@
+<!--- On CMD, on local build ---->
+
+npm start
+
+<!--- On prod ---->
+
+expo build:web
+# Export content of web_build to prod server
+
+npx serve
