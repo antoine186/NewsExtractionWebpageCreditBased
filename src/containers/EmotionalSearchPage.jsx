@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Icon, Image } from
 import CappedDatePicker from '../components/atoms/CappedDatePicker'
 import styles from '../utils/style_guide/MainWebpageStyle'
 import PropTypes from 'prop-types'
-import { api, searchUrl, getPreviousSearchResult } from '../utils/backend_configuration/BackendConfig'
+import { api, searchUrl, getPreviousSearchResult, basicAccountCreateUrl, createCheckout } from '../utils/backend_configuration/BackendConfig'
 import DateFormatter from '../utils/DateFormatter'
 import SearchArticlesResultTable from '../components/molecules/SearchArticlesResultTable'
 import ArticlesResultTableDataWrangler from './search_helper_functions/ArticlesResultTableDataWrangler'
@@ -13,6 +13,10 @@ import EmoEngagementStringFormatter from './search_helper_functions/EmoEngagemen
 import EmoSearchBasicResultCard from '../components/molecules/EmoSearchBasicResultCard'
 import { connect } from 'react-redux'
 import EmoSearchOverallResultCard from '../components/molecules/EmoSearchOverallResultCard'
+import { setAnonSession } from '../store/Slices/AnonSessionSlice'
+import CheckEmptyObject from '../utils/CheckEmptyObject'
+import GenerateRandomString from '../utils/GenerateRandomString'
+import { setCreditData, clearCreditDataSimple } from '../store/Slices/CreditSlice'
 
 function Link (props) {
   return <Text {...props} accessibilityRole="link" style={StyleSheet.compose(styles.link, props.style)} />
@@ -21,6 +25,51 @@ function Link (props) {
 class EmotionalSearchPage extends Component {
   constructor (props) {
     super(props)
+
+    let usernameToUse = ''
+
+    if (CheckEmptyObject(this.props.anonSession.anonSession)) {
+      usernameToUse = 'antoine186@hotmail.com'
+
+      const newAnonSessionId = GenerateRandomString(15)
+
+      const payload = {
+        firstName: newAnonSessionId,
+        lastName: newAnonSessionId,
+        emailAddress: newAnonSessionId,
+        password: newAnonSessionId,
+        dateBirth: new Date(),
+        telephoneNumber: newAnonSessionId,
+        telephoneAreaCode: newAnonSessionId,
+        selectedCountryName: newAnonSessionId,
+        selectedCountryCode: newAnonSessionId,
+        selectedStateCode: newAnonSessionId,
+        selectedStateName: newAnonSessionId,
+        selectedCityName: newAnonSessionId,
+        addressLine1: newAnonSessionId,
+        addressLine2: newAnonSessionId,
+        zipCode: newAnonSessionId
+      }
+
+      api.post(basicAccountCreateUrl, {
+        accountCreationData: payload
+      }, {
+        withCredentials: true
+      }
+      ).then(response => {
+        if (response.data.operation_success) {
+          // this.props.setAccountData(accountCreationData)
+          this.props.setAnonSession(newAnonSessionId)
+        } else {
+          this.forceUpdate()
+        }
+      }
+      )
+
+    } else {
+      const newAnonSessionId = this.props.anonSession.anonSession
+      usernameToUse = newAnonSessionId.payload
+    }
 
     this.state = {
       searchInput: '',
@@ -33,11 +82,30 @@ class EmotionalSearchPage extends Component {
       searchingInitiated: false,
       anyResponseFromServer: false,
       startDateString: '',
-      endDateString: ''
+      endDateString: '',
+      usernameToUse,
+      attemptAddCredits: false
+    }
+
+    const query = new URLSearchParams(window.location.search)
+
+    if (query.get('success')) {
+      console.log('Added 1 dollar')
+      if (this.props.creditData.creditData !== undefined && this.props.creditData.creditData !== null) {
+        this.props.setCreditData(1)
+      } else {
+        this.props.setCreditData(1)
+      }
+      query.delete('success')
+      window.location.replace(window.location.origin + '/' + query.toString())
+    }
+
+    if (query.get('canceled')) {
+      console.log('Didnt manage to add 1 dollar')
     }
 
     api.post(getPreviousSearchResult, {
-      username: this.props.accountData.accountData.payload.emailAddress
+      username: usernameToUse
     }, {
       withCredentials: true
     }
@@ -64,6 +132,25 @@ class EmotionalSearchPage extends Component {
   handleSubmit = (e) => {
     e.preventDefault()
 
+    /*
+    if (CheckEmptyObject(this.props.anonSession.anonSession)) {
+      console.log('No anon session set')
+      return
+    }
+
+    if (this.props.creditData.creditData === undefined) {
+      console.log('Not enough credits')
+      return
+    } else {
+      if (this.props.creditData.creditData - 0.2 < 0) {
+        console.log('Not enough credits')
+        return
+      }
+    }
+
+    this.props.clearCreditDataSimple(this.props.creditData.creditData.payload - 0.2)
+    */
+
     this.setState({ searchingInitiated: true })
     this.setState({ noResultsToReturn: false })
 
@@ -72,7 +159,7 @@ class EmotionalSearchPage extends Component {
     api.post(searchUrl, {
       searchInput: this.state.searchInput,
       dateInput: this.state.dateInput,
-      username: this.props.accountData.accountData.payload.emailAddress
+      username: this.state.usernameToUse
     }, {
       withCredentials: true
     }
@@ -100,7 +187,7 @@ class EmotionalSearchPage extends Component {
         () => {
           console.log('Triggered timeout recovery')
           api.post(getPreviousSearchResult, {
-            username: this.props.accountData.accountData.payload.emailAddress
+            username: this.state.usernameToUse
           }, {
             withCredentials: true
           }
@@ -177,8 +264,27 @@ class EmotionalSearchPage extends Component {
     return dateString
   }
 
+  addCredits () {
+    this.setState({ attemptAddCredits: true })
+
+    api.post(createCheckout, {
+      empty: ''
+    }, {
+      withCredentials: true
+    }
+    ).then(response => {
+      if (response.data.operation_success) {
+        window.location.replace(response.data.responsePayload.checkout_url)
+      }
+    }
+    )
+  }
+
   render () {
     return (
+      <View style={styles.subcontainer}>
+          <Text style={styles.text}>Credit only valid for your session. Please spend within 2 hours and do not clear browser cookies.</Text>
+          <Text style={styles.text}>For support, please email antoine.tian@emomachines.xyz</Text>
         <View style={styles.innerContainer}>
           <View class="form-group form-row">
             <View class="col-10">
@@ -198,8 +304,18 @@ class EmotionalSearchPage extends Component {
               <CappedDatePicker minDate={this.state.minDate} onChange={this.onChange.bind(this)} />
               {!this.state.searchingInitiated &&
                 <TouchableOpacity style={styles.searchBtn} onPress={this.handleSubmit}>
-                  <Text style={styles.text}>SEARCH</Text>
+                  <Text style={styles.text}>SEARCH $0.20</Text>
                 </TouchableOpacity>
+              }
+              {!this.state.searchingInitiated && this.props.creditData !== undefined &&
+                <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined? 0 : this.props.creditData.creditData}</Text>
+              }
+              {!this.state.searchingInitiated &&
+              <View>
+                <TouchableOpacity style={styles.searchBtn} onPress={this.addCredits.bind(this)}>
+                  <Text style={styles.text}>Add $1 Credit</Text>
+                </TouchableOpacity>
+              </View>
               }
             </View>
           </View>
@@ -212,7 +328,7 @@ class EmotionalSearchPage extends Component {
                 Please Come Back in a Minute or Two...
               </Text>
               <Text style={styles.text}>
-                Don't reissue the same query. If the page is blank within 10 min, we might still be searching!
+                Don't reissue the same query. If the page is blank within 5 min, we might still be searching!
               </Text>
               <br></br>
               <br></br>
@@ -272,6 +388,7 @@ class EmotionalSearchPage extends Component {
           </View>
           }
         </View>
+      </View>
     )
   }
 }
@@ -292,8 +409,19 @@ EmotionalSearchPage.defaultProps = {
 
 const mapStateToProps = state => {
   return {
-    accountData: state.accountData
+    accountData: state.accountData,
+    anonSession: state.anonSession,
+    creditData: state.creditData
   }
 }
 
-export default connect(mapStateToProps)(EmotionalSearchPage)
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setAnonSession: (value) => dispatch(setAnonSession(value)),
+    setAccountData: (value) => dispatch(setAccountData(value)),
+    setCreditData: (value) => dispatch(setCreditData(value)),
+    clearCreditDataSimple: (value) => dispatch(clearCreditDataSimple(value))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EmotionalSearchPage)

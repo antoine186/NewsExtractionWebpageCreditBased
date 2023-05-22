@@ -17,20 +17,12 @@ function App () {
   return (
     <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-            <React.StrictMode>
                 <HashRouter>
                     <Routes>
                         <Route path="/" element={<LandingSwitchingPage />} />
                         <Route index element={<LandingSwitchingPage />} />
-                        <Route path="login" element={<Login />} />
-                        <Route path="account-create" element={<AccountCreationPage />}/>
-                        <Route path="payment" element={<PaymentPage />} />
-                        <Route path="completion" element={<Completion />}/>
-                        <Route path="forgot-password" element={<ForgotPasswordPage />} />
-                        <Route path="reset-password" element={<PasswordResetPage />} />
                     </Routes>
                 </HashRouter>
-            </React.StrictMode>
         </PersistGate>
         <SessionController />
     </Provider>

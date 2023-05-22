@@ -76,7 +76,7 @@ class TagLine extends Component {
     this.state.setAlreadyTagging(this.state.searchInput)
 
     api.post(getPreviousTaggingResult, {
-      username: this.props.accountData.accountData.payload.emailAddress,
+      username: 'antoine186@hotmail.com',
       searchInput: this.state.searchInput
     }, {
       withCredentials: true
@@ -109,7 +109,7 @@ class TagLine extends Component {
 
   initiateSearch () {
     api.post(taggingSearch, {
-      username: this.props.accountData.accountData.payload.emailAddress,
+      username: 'antoine186@hotmail.com',
       searchInput: this.state.searchInput,
       searchDate: this.state.searchDate,
       dayBeforeSearchDate: this.state.dayBeforeSearchDate
@@ -157,16 +157,6 @@ class TagLine extends Component {
           <Text style={styles.tagText}>
               "{this.state.searchInput}"
           </Text>
-          <Button
-            variant="contained"
-            color="error"
-            style={{
-              marginLeft: 1.5 * vw
-            }}
-            onClick={this.deleteTag.bind(this)}
-          >
-            Remove
-          </Button>
         </View>
         {this.state.showResults &&
           <TagSearchResult

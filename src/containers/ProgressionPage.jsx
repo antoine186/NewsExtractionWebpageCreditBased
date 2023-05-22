@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Icon, Image } from 'react-native'
 import styles from '../utils/style_guide/MainWebpageStyle'
-import { api, progressionCharting, getPreviousCharting } from '../utils/backend_configuration/BackendConfig'
+import { api, progressionCharting, getPreviousCharting, createCheckout } from '../utils/backend_configuration/BackendConfig'
 import EmoProgressionCard from '../components/molecules/EmoProgressionCard'
 import { connect } from 'react-redux'
 import DateFormatter from '../utils/DateFormatter'
 import ClipLoader from 'react-spinners/ClipLoader'
+import CheckEmptyObject from '../utils/CheckEmptyObject'
+import { clearCreditDataLarge } from '../store/Slices/CreditSlice'
 
 class ProgressionPage extends Component {
   constructor (props) {
@@ -15,6 +17,9 @@ class ProgressionPage extends Component {
 
     relevantDate.setDate(relevantDate.getDate() - 1)
     const yesterday = DateFormatter(relevantDate)
+
+    const newAnonSessionId = this.props.anonSession.anonSession
+    const usernameToUse = newAnonSessionId.payload
 
     this.state = {
       searchInput: '',
@@ -36,13 +41,33 @@ class ProgressionPage extends Component {
       dateInput: yesterday,
       nothingToShow: true,
       chartingInitiated: false,
-      chartingFailed: false
+      chartingFailed: false,
+      attemptAddCredits: false,
+      usernameToUse
     }
 
     this.populateChartingData.bind(this)
 
+    // const usernameToUse = 'antoine186@hotmail.com'
+
+    const query = new URLSearchParams(window.location.search)
+
+    if (query.get('success')) {
+      console.log('Added 1 dollar')
+      if (this.props.creditData.creditData.payload !== undefined) {
+        this.props.setCreditData(this.props.creditData.creditData.payload + 1)
+      } else {
+        this.props.setCreditData(1)
+      }
+      query.delete('success')
+    }
+
+    if (query.get('canceled')) {
+      console.log('Didnt manage to add 1 dollar')
+    }
+
     api.post(getPreviousCharting, {
-      username: this.props.accountData.accountData.payload.emailAddress
+      username: usernameToUse
     }, {
       withCredentials: true
     }
@@ -208,8 +233,41 @@ class ProgressionPage extends Component {
     this.setState({ progressionDates: newProgressionDates })
   }
 
+  addCredits () {
+    this.setState({ attemptAddCredits: true })
+
+    api.post(createCheckout, {
+      empty: ''
+    }, {
+      withCredentials: true
+    }
+    ).then(response => {
+      if (response.data.operation_success) {
+        window.location.replace(response.data.responsePayload.checkout_url)
+      }
+    }
+    )
+  }
+
   handleSubmit = (e) => {
     e.preventDefault()
+
+    if (CheckEmptyObject(this.props.anonSession.anonSession)) {
+      console.log('No anon session set')
+      return
+    }
+
+    if (this.props.creditData.creditData === undefined) {
+      console.log('Not enough credits')
+      return
+    } else {
+      if (this.props.creditData.creditData - 0.2 < 0) {
+        console.log('Not enough credits')
+        return
+      }
+    }
+
+    this.props.clearCreditDataLarge(this.props.creditData.creditData.payload - 0.2)
 
     this.setState({ chartingInitiated: true })
     this.setState({ chartingFailed: false })
@@ -220,7 +278,7 @@ class ProgressionPage extends Component {
     api.post(progressionCharting, {
       searchInput: this.state.searchInput,
       dateInput: this.state.dateInput,
-      username: this.props.accountData.accountData.payload.emailAddress
+      username: this.state.usernameToUse
     }, {
       withCredentials: true
     }
@@ -254,7 +312,7 @@ class ProgressionPage extends Component {
         () => {
           console.log('Triggered timeout recovery')
           api.post(getPreviousCharting, {
-            username: this.props.accountData.accountData.payload.emailAddress
+            username: this.state.usernameToUse
           }, {
             withCredentials: true
           }
@@ -303,8 +361,18 @@ class ProgressionPage extends Component {
                     <br></br>
                     {!this.state.chartingInitiated &&
                         <TouchableOpacity style={styles.searchBtn} onPress={this.handleSubmit}>
-                            <Text style={styles.text}>CHART</Text>
+                            <Text style={styles.text}>CHART $0.60</Text>
                         </TouchableOpacity>
+                    }
+                    {!this.state.searchingInitiated && this.props.creditData !== undefined &&
+                      <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined? 0 : this.props.creditData.creditData}</Text>
+                    }
+                    {!this.state.chartingInitiated &&
+                    <View>
+                      <TouchableOpacity style={styles.searchBtn} onPress={this.addCredits.bind(this)}>
+                        <Text style={styles.text}>Add $1 Credit</Text>
+                      </TouchableOpacity>
+                    </View>
                     }
                 </View>
             </View>
@@ -369,10 +437,10 @@ class ProgressionPage extends Component {
               <br></br>
               <br></br>
               <Text style={styles.text}>
-                Still charting... Please come back in half an hour and !REFRESH! the page.
+                Still charting... Please come back in 10 minutes and !REFRESH! the page.
               </Text>
               <Text style={styles.text}>
-                Don't reissue the same query. If the page is blank within 30 min, we might still be searching!
+                Don't reissue the same query. If the page is blank within 15 min, we might still be searching!
               </Text>
               <br></br>
               <br></br>
@@ -398,8 +466,19 @@ class ProgressionPage extends Component {
 
 const mapStateToProps = state => {
   return {
-    accountData: state.accountData
+    accountData: state.accountData,
+    anonSession: state.anonSession,
+    creditData: state.creditData
   }
 }
 
-export default connect(mapStateToProps)(ProgressionPage)
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setAnonSession: (value) => dispatch(setAnonSession(value)),
+    setAccountData: (value) => dispatch(setAccountData(value)),
+    setCreditData: (value) => dispatch(setCreditData(value)),
+    clearCreditDataLarge: (value) => dispatch(clearCreditDataLarge(value))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProgressionPage)

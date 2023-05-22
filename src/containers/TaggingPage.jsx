@@ -31,7 +31,7 @@ class TaggingPage extends React.Component {
     }
 
     api.post(getTaggingInputs, {
-      username: this.props.accountData.accountData.payload.emailAddress
+      username: 'antoine186@hotmail.com'
     }, {
       withCredentials: true
     }
@@ -59,7 +59,7 @@ class TaggingPage extends React.Component {
 
       if (!this.state.existingTaggingInput) {
         api.post(saveTaggingInputs, {
-          username: this.props.accountData.accountData.payload.emailAddress,
+          username: 'antoine186@hotmail.com',
           taggingInputList: newSearchInputs
         }, {
           withCredentials: true
@@ -75,7 +75,7 @@ class TaggingPage extends React.Component {
         )
       } else {
         api.post(updateTaggingInputs, {
-          username: this.props.accountData.accountData.payload.emailAddress,
+          username: 'antoine186@hotmail.com',
           taggingInputList: newSearchInputs
         }, {
           withCredentials: true
@@ -106,7 +106,7 @@ class TaggingPage extends React.Component {
     })
 
     api.post(updateTaggingInputs, {
-      username: this.props.accountData.accountData.payload.emailAddress,
+      username: 'antoine186@hotmail.com',
       taggingInputList: newSearchInputsTaggingSet
     }, {
       withCredentials: true
@@ -133,7 +133,7 @@ class TaggingPage extends React.Component {
       this.setState({ existingTaggingInput: false })
 
       api.post(deleteTag, {
-        username: this.props.accountData.accountData.payload.emailAddress,
+        username: 'antoine186@hotmail.com',
         searchInput
       }, {
         withCredentials: true
@@ -146,7 +146,7 @@ class TaggingPage extends React.Component {
       )
 
       api.post(deleteTaggingInputs, {
-        username: this.props.accountData.accountData.payload.emailAddress
+        username: 'antoine186@hotmail.com'
       }, {
         withCredentials: true
       }
@@ -158,7 +158,7 @@ class TaggingPage extends React.Component {
       )
     } else {
       api.post(deleteTag, {
-        username: this.props.accountData.accountData.payload.emailAddress,
+        username: 'antoine186@hotmail.com',
         searchInput
       }, {
         withCredentials: true
@@ -171,7 +171,7 @@ class TaggingPage extends React.Component {
       )
 
       api.post(updateTaggingInputs, {
-        username: this.props.accountData.accountData.payload.emailAddress,
+        username: 'antoine186@hotmail.com',
         taggingInputList: newSearchInputs
       }, {
         withCredentials: true
@@ -198,18 +198,7 @@ class TaggingPage extends React.Component {
                 <View class="col-10">
                     <br></br>
                     <br></br>
-                    <TextInput
-                        editable
-                        multiline
-                        numberOfLines={4}
-                        maxLength={40}
-                        value={this.state.searchInput}
-                        onChangeText={text => this.setState({ searchInput: text })}
-                        placeholder={'Try tagging \'ChatGPT\'... (tagging might take a few hours)'}
-                        style={{ padding: 10, borderWidth: 2, borderColor: '#BC2BEA' }}
-                    />
-                    <br></br>
-                    {!this.state.searchingInitiated &&
+                    {false &&
                         <TouchableOpacity style={styles.searchBtn} onPress={this.handleSubmit.bind(this)}>
                             <Text style={styles.text}>TAG</Text>
                         </TouchableOpacity>

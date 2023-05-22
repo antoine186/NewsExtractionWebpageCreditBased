@@ -39,7 +39,7 @@ class LinkingPage extends Component {
     }
 
     api.post(getPreviousLinking, {
-      username: this.props.accountData.accountData.payload.emailAddress
+      username: 'antoine186@hotmail.com'
     }, {
       withCredentials: true
     }
@@ -206,12 +206,6 @@ class LinkingPage extends Component {
                 </View>
             </View>
             <View style={styles.innerContainer}>
-                  <br></br>
-                  {!this.state.linkingInitiated &&
-                      <TouchableOpacity style={styles.searchBtn} onPress={this.handleSubmit}>
-                          <Text style={styles.text}>LINK</Text>
-                      </TouchableOpacity>
-                  }
                   <br></br>
                   {!this.state.linkingInitiated && !this.state.noResultsToShow &&
                     <View>

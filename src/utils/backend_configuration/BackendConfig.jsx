@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-export const backendUrl = 'http://localhost:80/api'
-// export const backendUrl = 'https://emomachinesbackend.xyz/api'
+// export const backendUrl = 'http://localhost:80/api'
+export const backendUrl = 'https://emomachinesbackend.xyz/api'
 export const loginAuthUrl = '/auth-login'
 export const sessionAuthUrl = '/session-validate'
 export const searchUrl = '/search'
@@ -32,6 +32,7 @@ export const progressionCharting = './progression-charting'
 export const getPreviousCharting = './get-previous-charting'
 export const linkingTopics = './linking-topics'
 export const getPreviousLinking = './get-previous-linking'
+export const createCheckout = './create_checkout'
 
 export const api = axios.create({
   baseURL: backendUrl

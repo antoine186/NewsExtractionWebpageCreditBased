@@ -112,6 +112,21 @@ function returnStyles () {
       marginBottom: 0.5 * vw,
       width: 35 * sizeCardScaler * vw
     },
+    inputView: {
+      backgroundColor: '#FFC0CB',
+      borderRadius: 30,
+      width: 8 * sizeScaler * vw,
+      height: 1.8 * sizeScaler * vw,
+      marginBottom: 0.7 * vw,
+      alignItems: 'center'
+    },
+    textInput: {
+      height: '100%',
+      width: '100%',
+      flex: 1,
+      padding: 0.5 * vw,
+      marginLeft: 1 * vw
+    },
     errorText: {
       color: '#DC143C'
     }

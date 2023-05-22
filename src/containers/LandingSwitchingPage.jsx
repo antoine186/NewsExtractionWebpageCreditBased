@@ -68,76 +68,58 @@ class LandingSwitchingPage extends Component {
   }
 
   render () {
-    if (!this.state.userSessionValidated) {
-      return (
-        <View>
-            <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0" />
-            <Navigate to='/login' />
-        </View>
-      )
-    } else if (this.props.validSubscription.validSubscription.payload !== undefined && this.props.validSubscription.validSubscription.payload) {
-      return (
-        <View>
-            <TopBar settingsEnabled={true} />
-            <View style={styles.container}>
-                <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0" />
-                <View style={styles.header}>
-                  {this.state.searchShow &&
-                    <Text style={styles.titleText}>Emotional Machines Search (Beta)</Text>
-                  }
-                  {this.state.tagShow &&
-                    <Text style={styles.titleText}>Emotional Machines Tagging (Beta)</Text>
-                  }
-                  {this.state.progression &&
-                    <Text style={styles.titleText}>Emotional Machines Progression Charting (Beta)</Text>
-                  }
-                  {this.state.linking &&
-                    <Text style={styles.titleText}>Emotional Machines Link Analysis (Experimental)</Text>
-                  }
-                </View>
-                <ToggleButtonGroup
-                    // value={alignment}
-                    exclusive
-                    // onChange={handleAlignment}
-                >
-                    <ToggleButton value="search" onClick={this.toggleClickSearch}>
-                        <Image style={styles.image} source={require('../assets/images/magnifying-glass-search-icon-png-transparent.png')} />
-                    </ToggleButton>
-                    <ToggleButton value="tag" onClick={this.toggleClickTag}>
-                        <Image style={styles.image} source={require('../assets/images/tag.jpg')} />
-                    </ToggleButton>
-                    <ToggleButton value="progression" onClick={this.toggleClickProgression}>
-                        <Image style={styles.image} source={require('../assets/images/chart.jpg')} />
-                    </ToggleButton>
-                    <ToggleButton value="linking" onClick={this.toggleClickLinking}>
-                        <Image style={styles.image} source={require('../assets/images/node_graph.png')} />
-                    </ToggleButton>
-                </ToggleButtonGroup>
+    return (
+      <View>
+          <TopBar settingsEnabled={true} />
+          <View style={styles.container}>
+              <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0" />
+              <View style={styles.header}>
                 {this.state.searchShow &&
-                  <EmotionalSearchPage />
+                  <Text style={styles.titleText}>Emotional Machines Search (Beta)</Text>
                 }
                 {this.state.tagShow &&
-                  <TaggingPage />
+                  <Text style={styles.titleText}>Emotional Machines Tagging (Beta)</Text>
                 }
                 {this.state.progression &&
-                  <ProgressionPage />
+                  <Text style={styles.titleText}>Emotional Machines Progression Charting (Beta)</Text>
                 }
                 {this.state.linking &&
-                  <LinkingPage />
+                  <Text style={styles.titleText}>Emotional Machines Link Analysis (Experimental)</Text>
                 }
-            </View>
-        </View>
-      )
-    } else if (this.state.userSessionValidated && this.props.validSubscription.validSubscription.payload !== undefined) {
-      return (
-        <View>
-            <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0" />
-            <Navigate to='/payment' />
-        </View>
-      )
-    } else {
-      {this.forceUpdate()}
-    }
+              </View>
+              <ToggleButtonGroup
+                  // value={alignment}
+                  exclusive
+                  // onChange={handleAlignment}
+              >
+                  <ToggleButton value="search" onClick={this.toggleClickSearch}>
+                      <Image style={styles.image} source={require('../assets/images/magnifying-glass-search-icon-png-transparent.png')} />
+                  </ToggleButton>
+                  <ToggleButton value="tag" onClick={this.toggleClickTag}>
+                      <Image style={styles.image} source={require('../assets/images/tag.jpg')} />
+                  </ToggleButton>
+                  <ToggleButton value="progression" onClick={this.toggleClickProgression}>
+                      <Image style={styles.image} source={require('../assets/images/chart.jpg')} />
+                  </ToggleButton>
+                  <ToggleButton value="linking" onClick={this.toggleClickLinking}>
+                      <Image style={styles.image} source={require('../assets/images/node_graph.png')} />
+                  </ToggleButton>
+              </ToggleButtonGroup>
+              {this.state.searchShow &&
+                <EmotionalSearchPage />
+              }
+              {this.state.tagShow &&
+                <TaggingPage />
+              }
+              {this.state.progression &&
+                <ProgressionPage />
+              }
+              {this.state.linking &&
+                <LinkingPage />
+              }
+          </View>
+      </View>
+    )
   }
 }
 
