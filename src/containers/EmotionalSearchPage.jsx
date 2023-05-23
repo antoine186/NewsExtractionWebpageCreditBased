@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Icon, Image } from
 import CappedDatePicker from '../components/atoms/CappedDatePicker'
 import styles from '../utils/style_guide/MainWebpageStyle'
 import PropTypes from 'prop-types'
-import { api, searchUrl, getPreviousSearchResult, basicAccountCreateUrl, createCheckout } from '../utils/backend_configuration/BackendConfig'
+import { api, searchUrl, getPreviousSearchResult, basicAccountCreateUrl, createCheckout, checkStillSearching } from '../utils/backend_configuration/BackendConfig'
 import DateFormatter from '../utils/DateFormatter'
 import SearchArticlesResultTable from '../components/molecules/SearchArticlesResultTable'
 import ArticlesResultTableDataWrangler from './search_helper_functions/ArticlesResultTableDataWrangler'
@@ -65,7 +65,6 @@ class EmotionalSearchPage extends Component {
         }
       }
       )
-
     } else {
       const newAnonSessionId = this.props.anonSession.anonSession
       usernameToUse = newAnonSessionId.payload
@@ -104,27 +103,80 @@ class EmotionalSearchPage extends Component {
       console.log('Didnt manage to add 1 dollar')
     }
 
-    api.post(getPreviousSearchResult, {
+    api.post(checkStillSearching, {
       username: usernameToUse
     }, {
       withCredentials: true
     }
     ).then(response => {
       if (response.data.operation_success) {
-        console.log('Retrieved previous search returned something!')
-        this.setState({ searchInput: response.data.responsePayload.previous_search_result.search_input })
-        this.setState({ startDateString: this.date2String(response.data.responsePayload.previous_search_result.search_start_date) })
-        this.setState({ endDateString: this.date2String(response.data.responsePayload.previous_search_result.search_end_date) })
-        this.setState({ noPreviousResults: false })
-        this.populateOverallEmoResultTable(response.data.responsePayload.previous_search_result)
-        this.populateArticlesResultTable(response.data.responsePayload.previous_search_result)
+        console.log('Still searching')
+
+        const oneSecond = 1000
+
+        setTimeout(
+          () => {
+            console.log('Triggered timeout recovery')
+            api.post(getPreviousSearchResult, {
+              username: usernameToUse
+            }, {
+              withCredentials: true
+            }
+            ).then(response => {
+              if (response.data.operation_success) {
+                console.log('Retrieved previous search returned something!')
+                this.setState({ searchInput: response.data.responsePayload.previous_search_result.search_input })
+                this.setState({ startDateString: this.date2String(response.data.responsePayload.previous_search_result.search_start_date) })
+                this.setState({ endDateString: this.date2String(response.data.responsePayload.previous_search_result.search_end_date) })
+                this.setState({ noPreviousResults: false })
+                this.populateOverallEmoResultTable(response.data.responsePayload.previous_search_result)
+                this.populateArticlesResultTable(response.data.responsePayload.previous_search_result)
+              } else {
+                console.log('Search failed for an internal reason')
+                this.setState({ noResultsToReturn: true })
+                this.setState({ searchingInitiated: false })
+                this.setState({ noPreviousResults: true })
+              }
+            }
+            ).catch(error => {
+              console.log('No previous search results')
+              this.setState({ noResultsToReturn: true })
+              this.setState({ searchingInitiated: false })
+              this.setState({ noPreviousResults: true })
+            })
+          }, oneSecond * 60)
+
+        this.setState({ searchingInitiated: true })
       } else {
-        console.log('No previous search results')
-        this.setState({ noPreviousResults: true })
+        console.log('No searches ongoing')
+
+        api.post(getPreviousSearchResult, {
+          username: usernameToUse
+        }, {
+          withCredentials: true
+        }
+        ).then(response => {
+          if (response.data.operation_success) {
+            console.log('Retrieved previous search returned something!')
+            this.setState({ searchInput: response.data.responsePayload.previous_search_result.search_input })
+            this.setState({ startDateString: this.date2String(response.data.responsePayload.previous_search_result.search_start_date) })
+            this.setState({ endDateString: this.date2String(response.data.responsePayload.previous_search_result.search_end_date) })
+            this.setState({ noPreviousResults: false })
+            this.populateOverallEmoResultTable(response.data.responsePayload.previous_search_result)
+            this.populateArticlesResultTable(response.data.responsePayload.previous_search_result)
+          } else {
+            console.log('No previous search results')
+            this.setState({ noPreviousResults: true })
+          }
+        }
+        ).catch(error => {
+          console.log('No previous search results')
+          this.setState({ noPreviousResults: true })
+        })
       }
     }
     ).catch(error => {
-      console.log('No previous search results')
+      console.log('Check search in progress failed')
       this.setState({ noPreviousResults: true })
     })
   }
@@ -137,6 +189,7 @@ class EmotionalSearchPage extends Component {
       return
     }
 
+    /*
     if (this.props.creditData.creditData === undefined) {
       console.log('Not enough credits')
       return
@@ -145,7 +198,7 @@ class EmotionalSearchPage extends Component {
         console.log('Not enough credits')
         return
       }
-    }
+    }*/
 
     this.props.clearCreditDataSimple(this.props.creditData.creditData.payload - 0.2)
 
