@@ -132,7 +132,6 @@ class EmotionalSearchPage extends Component {
   handleSubmit = (e) => {
     e.preventDefault()
 
-    /*
     if (CheckEmptyObject(this.props.anonSession.anonSession)) {
       console.log('No anon session set')
       return
@@ -149,7 +148,6 @@ class EmotionalSearchPage extends Component {
     }
 
     this.props.clearCreditDataSimple(this.props.creditData.creditData.payload - 0.2)
-    */
 
     this.setState({ searchingInitiated: true })
     this.setState({ noResultsToReturn: false })
