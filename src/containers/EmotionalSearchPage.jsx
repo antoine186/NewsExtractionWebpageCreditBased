@@ -392,6 +392,7 @@ class EmotionalSearchPage extends Component {
             </View>
           </View>
           <br></br>
+          {!this.state.searchingInitiated &&
           <br></br>
           <br></br>
           <View>
@@ -408,6 +409,7 @@ class EmotionalSearchPage extends Component {
             allowFullScreen></iframe>
           </View>
           <br></br>
+          }
           {this.state.searchingInitiated &&
             <View>
               <br></br>

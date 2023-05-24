@@ -457,6 +457,7 @@ class ProgressionPage extends Component {
                 </View>
             </View>
             <br></br>
+            {!this.state.chartingInitiated &&
             <br></br>
             <br></br>
             <View>
@@ -473,6 +474,7 @@ class ProgressionPage extends Component {
                 allowFullScreen></iframe>
             </View>
             <br></br>
+            }
             {!this.state.nothingToShow && !this.state.chartingInitiated &&
                 <View style={styles.innerContainer}>
                     <br></br>
