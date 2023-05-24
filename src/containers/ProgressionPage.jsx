@@ -8,6 +8,7 @@ import DateFormatter from '../utils/DateFormatter'
 import ClipLoader from 'react-spinners/ClipLoader'
 import CheckEmptyObject from '../utils/CheckEmptyObject'
 import { clearCreditDataLarge } from '../store/Slices/CreditSlice'
+import { setProgressionTimeoutState } from '../store/Slices/ProgressionTimeoutSlice'
 
 class ProgressionPage extends Component {
   constructor (props) {
@@ -81,7 +82,11 @@ class ProgressionPage extends Component {
           this.setState({ chartingFailed: false })
           this.setState({ nothingToShow: true })
 
-          setTimeout(
+          console.log(this.props.progressionTimeoutState.progressionTimeoutState.payload)
+
+          clearTimeout(this.props.progressionTimeoutState.progressionTimeoutState.payload)
+
+          const currentTimeout = setTimeout(
             () => {
               console.log('Triggered timeout recovery')
 
@@ -110,6 +115,8 @@ class ProgressionPage extends Component {
               }
               )
             }, oneSecond * 60 * 15)
+
+            this.props.setProgressionTimeoutState(currentTimeout)
         } else {
           console.log('No charting currently ongoing')
 
@@ -368,7 +375,11 @@ class ProgressionPage extends Component {
     ).catch(error => {
       if (error.code === 'ERR_BAD_RESPONSE') {
       }
-      setTimeout(
+      console.log(this.props.progressionTimeoutState.progressionTimeoutState.payload)
+
+      clearTimeout(this.props.progressionTimeoutState.progressionTimeoutState.payload)
+
+      const currentTimeout = setTimeout(
         () => {
           console.log('Triggered timeout recovery')
           api.post(getPreviousCharting, {
@@ -398,6 +409,8 @@ class ProgressionPage extends Component {
             this.setState({ chartingFailed: true })
           })
         }, oneSecond * 60 * 15)
+
+        this.props.setProgressionTimeoutState(currentTimeout)
     })
   }
 
@@ -530,7 +543,8 @@ const mapStateToProps = state => {
   return {
     accountData: state.accountData,
     anonSession: state.anonSession,
-    creditData: state.creditData
+    creditData: state.creditData,
+    progressionTimeoutState: state.progressionTimeoutState
   }
 }
 
@@ -539,7 +553,8 @@ const mapDispatchToProps = (dispatch) => {
     setAnonSession: (value) => dispatch(setAnonSession(value)),
     setAccountData: (value) => dispatch(setAccountData(value)),
     setCreditData: (value) => dispatch(setCreditData(value)),
-    clearCreditDataLarge: (value) => dispatch(clearCreditDataLarge(value))
+    clearCreditDataLarge: (value) => dispatch(clearCreditDataLarge(value)),
+    setProgressionTimeoutState: (value) => dispatch(setProgressionTimeoutState(value))
   }
 }
 

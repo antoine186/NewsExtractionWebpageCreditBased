@@ -200,7 +200,6 @@ class EmotionalSearchPage extends Component {
       return
     }
 
-    /*
     if (this.props.creditData.creditData === undefined) {
       console.log('Not enough credits')
       return
@@ -209,7 +208,7 @@ class EmotionalSearchPage extends Component {
         console.log('Not enough credits')
         return
       }
-    } */
+    }
 
     this.props.clearCreditDataSimple(this.props.creditData.creditData.payload - 0.2)
 
