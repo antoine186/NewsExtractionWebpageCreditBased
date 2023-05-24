@@ -458,22 +458,24 @@ class ProgressionPage extends Component {
             </View>
             <br></br>
             {!this.state.chartingInitiated &&
-            <br></br>
-            <br></br>
-            <View>
-              <Text style={styles.text}>How To Chart Emotionality Over the Past 6 Months</Text>
-            </View>
-            <View>
-              <iframe
-                width="560"
-                height="315"
-                src="https://www.youtube.com/embed/mttGtRwPPNk"
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen></iframe>
-            </View>
-            <br></br>
+              <View>
+                <br></br>
+                <br></br>
+                <View>
+                  <Text style={styles.text}>How To Chart Emotionality Over the Past 6 Months</Text>
+                </View>
+                <View>
+                  <iframe
+                    width="560"
+                    height="315"
+                    src="https://www.youtube.com/embed/mttGtRwPPNk"
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen></iframe>
+                </View>
+                <br></br>
+              </View>
             }
             {!this.state.nothingToShow && !this.state.chartingInitiated &&
                 <View style={styles.innerContainer}>

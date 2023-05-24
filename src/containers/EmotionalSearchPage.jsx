@@ -393,22 +393,24 @@ class EmotionalSearchPage extends Component {
           </View>
           <br></br>
           {!this.state.searchingInitiated &&
-          <br></br>
-          <br></br>
-          <View>
-            <Text style={styles.text}>How To Find Articles Leading Emotional Categories for any Week-long Period</Text>
-          </View>
-          <View>
-          <iframe
-            width="560"
-            height="315"
-            src="https://www.youtube.com/embed/KDeo65ZMf2A"
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            allowFullScreen></iframe>
-          </View>
-          <br></br>
+            <View>
+              <br></br>
+              <br></br>
+              <View>
+                <Text style={styles.text}>How To Find Articles Leading Emotional Categories for any Week-long Period</Text>
+              </View>
+              <View>
+              <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/KDeo65ZMf2A"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowFullScreen></iframe>
+              </View>
+              <br></br>
+            </View>
           }
           {this.state.searchingInitiated &&
             <View>
