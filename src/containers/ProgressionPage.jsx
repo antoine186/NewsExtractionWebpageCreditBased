@@ -9,6 +9,8 @@ import ClipLoader from 'react-spinners/ClipLoader'
 import CheckEmptyObject from '../utils/CheckEmptyObject'
 import { clearCreditDataLarge } from '../store/Slices/CreditSlice'
 import { setProgressionTimeoutState } from '../store/Slices/ProgressionTimeoutSlice'
+import ProcessCredits from '../utils/ProcessCredits'
+import { testingLocally } from '../utils/front_end_configuration/FrontendConfig'
 
 class ProgressionPage extends Component {
   constructor (props) {
@@ -324,16 +326,17 @@ class ProgressionPage extends Component {
       return
     }
 
-    /*
-    if (this.props.creditData.creditData === undefined) {
-      console.log('Not enough credits')
-      return
-    } else {
-      if (this.props.creditData.creditData - 0.2 < 0) {
+    if (!testingLocally) {
+      if (this.props.creditData.creditData === undefined) {
         console.log('Not enough credits')
         return
+      } else {
+        if (this.props.creditData.creditData - 0.2 < 0) {
+          console.log('Not enough credits')
+          return
+        }
       }
-    } */
+    }
 
     this.props.clearCreditDataLarge(this.props.creditData.creditData.payload - 0.2)
 
@@ -441,7 +444,7 @@ class ProgressionPage extends Component {
                         </TouchableOpacity>
                     }
                     {!this.state.searchingInitiated && this.props.creditData !== undefined &&
-                      <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined ? 0 : this.props.creditData.creditData}</Text>
+                      <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined ? 0 : ProcessCredits(this.props.creditData.creditData)}</Text>
                     }
                     {!this.state.chartingInitiated &&
                     <View>
@@ -451,6 +454,22 @@ class ProgressionPage extends Component {
                     </View>
                     }
                 </View>
+            </View>
+            <br></br>
+            <br></br>
+            <br></br>
+            <View>
+              <Text style={styles.text}>How To Chart Emotionality Over the Past 6 Months</Text>
+            </View>
+            <View>
+              <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/mttGtRwPPNk"
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen></iframe>
             </View>
             <br></br>
             {!this.state.nothingToShow && !this.state.chartingInitiated &&

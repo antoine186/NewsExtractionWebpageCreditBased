@@ -18,6 +18,8 @@ import CheckEmptyObject from '../utils/CheckEmptyObject'
 import GenerateRandomString from '../utils/GenerateRandomString'
 import { setCreditData, clearCreditDataSimple } from '../store/Slices/CreditSlice'
 import { setSearchTimeoutState } from '../store/Slices/SearchTimeoutSlice'
+import ProcessCredits from '../utils/ProcessCredits'
+import { testingLocally } from '../utils/front_end_configuration/FrontendConfig'
 
 function Link (props) {
   return <Text {...props} accessibilityRole="link" style={StyleSheet.compose(styles.link, props.style)} />
@@ -200,13 +202,15 @@ class EmotionalSearchPage extends Component {
       return
     }
 
-    if (this.props.creditData.creditData === undefined) {
-      console.log('Not enough credits')
-      return
-    } else {
-      if (this.props.creditData.creditData - 0.2 < 0) {
+    if (!testingLocally) {
+      if (this.props.creditData.creditData === undefined) {
         console.log('Not enough credits')
         return
+      } else {
+        if (this.props.creditData.creditData - 0.2 < 0) {
+          console.log('Not enough credits')
+          return
+        }
       }
     }
 
@@ -376,7 +380,7 @@ class EmotionalSearchPage extends Component {
                 </TouchableOpacity>
               }
               {!this.state.searchingInitiated && this.props.creditData !== undefined &&
-                <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined? 0 : this.props.creditData.creditData}</Text>
+                <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined? 0 : ProcessCredits(this.props.creditData.creditData)}</Text>
               }
               {!this.state.searchingInitiated &&
               <View>
@@ -386,6 +390,22 @@ class EmotionalSearchPage extends Component {
               </View>
               }
             </View>
+          </View>
+          <br></br>
+          <br></br>
+          <br></br>
+          <View>
+            <Text style={styles.text}>How To Find Articles Leading Emotional Categories for any Week-long Period</Text>
+          </View>
+          <View>
+          <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/KDeo65ZMf2A"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowFullScreen></iframe>
           </View>
           <br></br>
           {this.state.searchingInitiated &&
