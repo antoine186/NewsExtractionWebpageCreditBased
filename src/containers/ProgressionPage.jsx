@@ -61,6 +61,7 @@ class ProgressionPage extends Component {
           this.props.setCreditData(1)
         }
         query.delete('success')
+        window.location.replace(window.location.origin + '/' + query.toString())
       }
 
       if (query.get('canceled')) {
