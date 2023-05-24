@@ -11,6 +11,7 @@ import { clearCreditDataLarge } from '../store/Slices/CreditSlice'
 import { setProgressionTimeoutState } from '../store/Slices/ProgressionTimeoutSlice'
 import ProcessCredits from '../utils/ProcessCredits'
 import { testingLocally } from '../utils/front_end_configuration/FrontendConfig'
+import { setCreditData } from '../store/Slices/CreditSlice'
 
 class ProgressionPage extends Component {
   constructor (props) {
