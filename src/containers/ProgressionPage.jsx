@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Icon, Image } from 'react-native'
 import styles from '../utils/style_guide/MainWebpageStyle'
-import { api, progressionCharting, getPreviousCharting, createCheckout } from '../utils/backend_configuration/BackendConfig'
+import { api, progressionCharting, getPreviousCharting, createCheckout, checkStillCharting } from '../utils/backend_configuration/BackendConfig'
 import EmoProgressionCard from '../components/molecules/EmoProgressionCard'
 import { connect } from 'react-redux'
 import DateFormatter from '../utils/DateFormatter'
@@ -49,40 +49,99 @@ class ProgressionPage extends Component {
     this.populateChartingData.bind(this)
 
     // const usernameToUse = 'antoine186@hotmail.com'
+    if (!CheckEmptyObject(this.props.anonSession.anonSession)) {
+      const query = new URLSearchParams(window.location.search)
 
-    const query = new URLSearchParams(window.location.search)
-
-    if (query.get('success')) {
-      console.log('Added 1 dollar')
-      if (this.props.creditData.creditData.payload !== undefined) {
-        this.props.setCreditData(this.props.creditData.creditData.payload + 1)
-      } else {
-        this.props.setCreditData(1)
+      if (query.get('success')) {
+        console.log('Added 1 dollar')
+        if (this.props.creditData.creditData.payload !== undefined) {
+          this.props.setCreditData(this.props.creditData.creditData.payload + 1)
+        } else {
+          this.props.setCreditData(1)
+        }
+        query.delete('success')
       }
-      query.delete('success')
-    }
 
-    if (query.get('canceled')) {
-      console.log('Didnt manage to add 1 dollar')
-    }
-
-    api.post(getPreviousCharting, {
-      username: usernameToUse
-    }, {
-      withCredentials: true
-    }
-    ).then(response => {
-      if (response.data.operation_success) {
-        console.log('Retrieved previous charting')
-        this.setState({ nothingToShow: false })
-        this.populateChartingData(response.data.responsePayload.previous_chart_result)
-        this.setState({ searchInput: response.data.responsePayload.previous_chart_result.emo_breakdown_result_metadata_1.search_input })
-      } else {
-        console.log('Retrieving previous charting failed')
-        this.setState({ nothingToShow: true })
+      if (query.get('canceled')) {
+        console.log('Didnt manage to add 1 dollar')
       }
+
+      const oneSecond = 1000
+
+      api.post(checkStillCharting, {
+        username: usernameToUse
+      }, {
+        withCredentials: true
+      }
+      ).then(response => {
+        if (response.data.operation_success) {
+          console.log('Found currently ongoing charting')
+
+          this.setState({ chartingInitiated: true })
+          this.setState({ chartingFailed: false })
+          this.setState({ nothingToShow: true })
+
+          setTimeout(
+            () => {
+              console.log('Triggered timeout recovery')
+
+              api.post(getPreviousCharting, {
+                username: usernameToUse
+              }, {
+                withCredentials: true
+              }
+              ).then(response => {
+                if (response.data.operation_success) {
+                  console.log('Retrieved previous charting')
+                  this.setState({ nothingToShow: false })
+                  this.populateChartingData(response.data.responsePayload.previous_chart_result)
+                  this.setState({ searchInput: response.data.responsePayload.previous_chart_result.emo_breakdown_result_metadata_1.search_input })
+
+                  this.setState({ chartingInitiated: false })
+                  this.setState({ chartingFailed: false })
+                  this.setState({ nothingToShow: false })
+                } else {
+                  console.log('Retrieving previous charting failed')
+
+                  this.setState({ chartingInitiated: false })
+                  this.setState({ chartingFailed: true })
+                  this.setState({ nothingToShow: true })
+                }
+              }
+              )
+            }, oneSecond * 60 * 15)
+        } else {
+          console.log('No charting currently ongoing')
+
+          api.post(getPreviousCharting, {
+            username: usernameToUse
+          }, {
+            withCredentials: true
+          }
+          ).then(response => {
+            if (response.data.operation_success) {
+              console.log('Retrieved previous charting')
+              this.setState({ nothingToShow: false })
+              this.populateChartingData(response.data.responsePayload.previous_chart_result)
+              this.setState({ searchInput: response.data.responsePayload.previous_chart_result.emo_breakdown_result_metadata_1.search_input })
+            } else {
+              console.log('Retrieving previous charting failed')
+              this.setState({ nothingToShow: true })
+            }
+          }
+          )
+        }
+      }
+      )
     }
-    )
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    if (prevProps.anonSession !== this.props.anonSession) {
+      const newAnonSessionId = this.props.anonSession.anonSession
+      const usernameToUse = newAnonSessionId.payload
+      this.setState({ usernameToUse })
+    }
   }
 
   populateChartingData (data) {
@@ -257,6 +316,7 @@ class ProgressionPage extends Component {
       return
     }
 
+    /*
     if (this.props.creditData.creditData === undefined) {
       console.log('Not enough credits')
       return
@@ -265,7 +325,7 @@ class ProgressionPage extends Component {
         console.log('Not enough credits')
         return
       }
-    }
+    } */
 
     this.props.clearCreditDataLarge(this.props.creditData.creditData.payload - 0.2)
 
@@ -344,6 +404,8 @@ class ProgressionPage extends Component {
   render () {
     return (
         <View style={styles.innerContainer}>
+          <Text style={styles.text}>Credit only valid for your session. Please spend within 2 hours and do not clear browser cookies.</Text>
+          <Text style={styles.text}>For support, please email antoine.tian@emomachines.xyz</Text>
             <View class="form-group form-row">
                 <View class="col-10">
                     <br></br>
@@ -365,7 +427,7 @@ class ProgressionPage extends Component {
                         </TouchableOpacity>
                     }
                     {!this.state.searchingInitiated && this.props.creditData !== undefined &&
-                      <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined? 0 : this.props.creditData.creditData}</Text>
+                      <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined ? 0 : this.props.creditData.creditData}</Text>
                     }
                     {!this.state.chartingInitiated &&
                     <View>

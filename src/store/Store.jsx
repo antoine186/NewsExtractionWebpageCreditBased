@@ -14,6 +14,8 @@ import PasswordResetAccountReducer from './Slices/PasswordResetAccountSlice'
 import SubscriptionStoredReducer from './Slices/SubscriptionStoredSlice'
 import AnonSessionReducer from './Slices/AnonSessionSlice'
 import CreditReducer from './Slices/CreditSlice'
+import SearchTimeoutReducer from './Slices/SearchTimeoutSlice'
+import ProgressionTimeoutReducer from './Slices/ProgressionTimeoutSlice'
 
 const rootReducer = combineReducers({
   userSession: userSessionReducer,
@@ -26,7 +28,9 @@ const rootReducer = combineReducers({
   passwordResetAccountState: PasswordResetAccountReducer,
   subscriptionStoredState: SubscriptionStoredReducer,
   anonSession: AnonSessionReducer,
-  creditData: CreditReducer
+  creditData: CreditReducer,
+  searchTimeoutState: SearchTimeoutReducer,
+  progressionTimeoutState: ProgressionTimeoutReducer
 })
 
 export const persistConfig = {
@@ -43,7 +47,9 @@ export const persistConfig = {
     'passwordResetAccountState',
     'subscriptionStoredState',
     'anonSession',
-    'creditData'
+    'creditData',
+    'searchTimeoutState',
+    'progressionTimeoutState'
   ]
 }
 

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Icon, Image } from
 import CappedDatePicker from '../components/atoms/CappedDatePicker'
 import styles from '../utils/style_guide/MainWebpageStyle'
 import PropTypes from 'prop-types'
-import { api, searchUrl, getPreviousSearchResult, basicAccountCreateUrl, createCheckout, checkStillSearching } from '../utils/backend_configuration/BackendConfig'
+import { api, searchUrl, getPreviousSearchResult, createCheckout, checkStillSearching } from '../utils/backend_configuration/BackendConfig'
 import DateFormatter from '../utils/DateFormatter'
 import SearchArticlesResultTable from '../components/molecules/SearchArticlesResultTable'
 import ArticlesResultTableDataWrangler from './search_helper_functions/ArticlesResultTableDataWrangler'
@@ -17,6 +17,7 @@ import { setAnonSession } from '../store/Slices/AnonSessionSlice'
 import CheckEmptyObject from '../utils/CheckEmptyObject'
 import GenerateRandomString from '../utils/GenerateRandomString'
 import { setCreditData, clearCreditDataSimple } from '../store/Slices/CreditSlice'
+import { setSearchTimeoutState } from '../store/Slices/SearchTimeoutSlice'
 
 function Link (props) {
   return <Text {...props} accessibilityRole="link" style={StyleSheet.compose(styles.link, props.style)} />
@@ -26,6 +27,7 @@ class EmotionalSearchPage extends Component {
   constructor (props) {
     super(props)
 
+    /*
     let usernameToUse = ''
 
     if (CheckEmptyObject(this.props.anonSession.anonSession)) {
@@ -68,7 +70,10 @@ class EmotionalSearchPage extends Component {
     } else {
       const newAnonSessionId = this.props.anonSession.anonSession
       usernameToUse = newAnonSessionId.payload
-    }
+    } */
+
+    const newAnonSessionId = this.props.anonSession.anonSession
+    const usernameToUse = newAnonSessionId.payload
 
     this.state = {
       searchInput: '',
@@ -114,7 +119,11 @@ class EmotionalSearchPage extends Component {
 
         const oneSecond = 1000
 
-        setTimeout(
+        console.log(this.props.searchTimeoutState.searchTimeoutState.payload)
+
+        clearTimeout(this.props.searchTimeoutState.searchTimeoutState.payload)
+
+        const currentTimeout = setTimeout(
           () => {
             console.log('Triggered timeout recovery')
             api.post(getPreviousSearchResult, {
@@ -145,6 +154,8 @@ class EmotionalSearchPage extends Component {
               this.setState({ noPreviousResults: true })
             })
           }, oneSecond * 60)
+
+        this.props.setSearchTimeoutState(currentTimeout)
 
         this.setState({ searchingInitiated: true })
       } else {
@@ -198,7 +209,7 @@ class EmotionalSearchPage extends Component {
         console.log('Not enough credits')
         return
       }
-    }*/
+    } */
 
     this.props.clearCreditDataSimple(this.props.creditData.creditData.payload - 0.2)
 
@@ -223,6 +234,7 @@ class EmotionalSearchPage extends Component {
         this.setState({ noPreviousResults: false })
         this.populateOverallEmoResultTable(response.data)
         this.populateArticlesResultTable(response.data)
+        clearTimeout(this.props.searchTimeoutState.searchTimeoutState.payload)
         this.forceUpdate()
       } else {
         this.setState({ noResultsToReturn: true })
@@ -234,7 +246,11 @@ class EmotionalSearchPage extends Component {
       // Also add 'ERR_EMPTY_RESPONSE'
       if (error.code === 'ERR_BAD_RESPONSE') {
       }
-      setTimeout(
+      console.log(this.props.searchTimeoutState.searchTimeoutState.payload)
+
+      clearTimeout(this.props.searchTimeoutState.searchTimeoutState.payload)
+
+      const currentTimeout = setTimeout(
         () => {
           console.log('Triggered timeout recovery')
           api.post(getPreviousSearchResult, {
@@ -265,6 +281,8 @@ class EmotionalSearchPage extends Component {
             this.setState({ noPreviousResults: true })
           })
         }, oneSecond * 60)
+
+        this.props.setSearchTimeoutState(currentTimeout)
     })
   }
 
@@ -462,16 +480,17 @@ const mapStateToProps = state => {
   return {
     accountData: state.accountData,
     anonSession: state.anonSession,
-    creditData: state.creditData
+    creditData: state.creditData,
+    searchTimeoutState: state.searchTimeoutState
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     setAnonSession: (value) => dispatch(setAnonSession(value)),
-    setAccountData: (value) => dispatch(setAccountData(value)),
     setCreditData: (value) => dispatch(setCreditData(value)),
-    clearCreditDataSimple: (value) => dispatch(clearCreditDataSimple(value))
+    clearCreditDataSimple: (value) => dispatch(clearCreditDataSimple(value)),
+    setSearchTimeoutState: (value) => dispatch(setSearchTimeoutState(value))
   }
 }
 

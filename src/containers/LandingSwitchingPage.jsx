@@ -10,16 +10,66 @@ import { connect } from 'react-redux'
 import TaggingPage from './TaggingPage'
 import ProgressionPage from './ProgressionPage'
 import LinkingPage from './LinkingPage'
+import CheckEmptyObject from '../utils/CheckEmptyObject'
+import { api, basicAccountCreateUrl } from '../utils/backend_configuration/BackendConfig'
+import GenerateRandomString from '../utils/GenerateRandomString'
+import { setAnonSession } from '../store/Slices/AnonSessionSlice'
 
 class LandingSwitchingPage extends Component {
   constructor (props) {
     super(props)
 
+    let usernameToUse = ''
+
+    if (CheckEmptyObject(this.props.anonSession.anonSession)) {
+      usernameToUse = 'antoine186@hotmail.com'
+
+      const newAnonSessionId = GenerateRandomString(15)
+
+      const payload = {
+        firstName: newAnonSessionId,
+        lastName: newAnonSessionId,
+        emailAddress: newAnonSessionId,
+        password: newAnonSessionId,
+        dateBirth: new Date(),
+        telephoneNumber: newAnonSessionId,
+        telephoneAreaCode: newAnonSessionId,
+        selectedCountryName: newAnonSessionId,
+        selectedCountryCode: newAnonSessionId,
+        selectedStateCode: newAnonSessionId,
+        selectedStateName: newAnonSessionId,
+        selectedCityName: newAnonSessionId,
+        addressLine1: newAnonSessionId,
+        addressLine2: newAnonSessionId,
+        zipCode: newAnonSessionId,
+        anonSessionSet: false
+      }
+
+      api.post(basicAccountCreateUrl, {
+        accountCreationData: payload
+      }, {
+        withCredentials: true
+      }
+      ).then(response => {
+        if (response.data.operation_success) {
+          // this.props.setAccountData(accountCreationData)
+          this.props.setAnonSession(newAnonSessionId)
+          this.setState({ anonSessionSet: true })
+        } else {
+          this.forceUpdate()
+        }
+      }
+      )
+    } // else {
+      // const newAnonSessionId = this.props.anonSession.anonSession
+      // usernameToUse = newAnonSessionId.payload
+    //}
+
     this.state = {
       userSessionValidated: this.props.userSession.validated,
-      searchShow: true,
+      searchShow: false,
       tagShow: false,
-      progression: false,
+      progression: true,
       linking: false
     }
 
@@ -92,18 +142,22 @@ class LandingSwitchingPage extends Component {
                   exclusive
                   // onChange={handleAlignment}
               >
-                  <ToggleButton value="search" onClick={this.toggleClickSearch}>
-                      <Image style={styles.image} source={require('../assets/images/magnifying-glass-search-icon-png-transparent.png')} />
-                  </ToggleButton>
-                  <ToggleButton value="tag" onClick={this.toggleClickTag}>
-                      <Image style={styles.image} source={require('../assets/images/tag.jpg')} />
-                  </ToggleButton>
                   <ToggleButton value="progression" onClick={this.toggleClickProgression}>
                       <Image style={styles.image} source={require('../assets/images/chart.jpg')} />
                   </ToggleButton>
+                  <ToggleButton value="search" onClick={this.toggleClickSearch}>
+                      <Image style={styles.image} source={require('../assets/images/magnifying-glass-search-icon-png-transparent.png')} />
+                  </ToggleButton>
+                  {/*
+                  <ToggleButton value="tag" onClick={this.toggleClickTag}>
+                      <Image style={styles.image} source={require('../assets/images/tag.jpg')} />
+                  </ToggleButton>
+                  */}
+                  {/*
                   <ToggleButton value="linking" onClick={this.toggleClickLinking}>
                       <Image style={styles.image} source={require('../assets/images/node_graph.png')} />
                   </ToggleButton>
+                  */}
               </ToggleButtonGroup>
               {this.state.searchShow &&
                 <EmotionalSearchPage />
@@ -126,8 +180,15 @@ class LandingSwitchingPage extends Component {
 const mapStateToProps = state => {
   return {
     userSession: state.userSession,
-    validSubscription: state.validSubscription
+    validSubscription: state.validSubscription,
+    anonSession: state.anonSession
   }
 }
 
-export default connect(mapStateToProps)(LandingSwitchingPage)
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setAnonSession: (value) => dispatch(setAnonSession(value))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LandingSwitchingPage)
