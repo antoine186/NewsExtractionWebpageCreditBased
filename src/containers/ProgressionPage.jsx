@@ -25,6 +25,8 @@ class ProgressionPage extends Component {
     const newAnonSessionId = this.props.anonSession.anonSession
     const usernameToUse = newAnonSessionId.payload
 
+    this.resultsRef = React.createRef()
+
     this.state = {
       searchInput: '',
       angerProgressionData: [],
@@ -51,6 +53,7 @@ class ProgressionPage extends Component {
     }
 
     this.populateChartingData.bind(this)
+    this.scrollToResults.bind(this)
 
     // const usernameToUse = 'antoine186@hotmail.com'
     if (!CheckEmptyObject(this.props.anonSession.anonSession)) {
@@ -153,6 +156,7 @@ class ProgressionPage extends Component {
       const usernameToUse = newAnonSessionId.payload
       this.setState({ usernameToUse })
     }
+    this.scrollToResults()
   }
 
   populateChartingData (data) {
@@ -319,6 +323,19 @@ class ProgressionPage extends Component {
     )
   }
 
+  scrollToLoading () {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth'
+    })
+  }
+
+  scrollToResults () {
+    if (this.resultsRef.current !== null) {
+      this.resultsRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   handleSubmit = (e) => {
     e.preventDefault()
 
@@ -478,7 +495,7 @@ class ProgressionPage extends Component {
               </View>
             }
             {!this.state.nothingToShow && !this.state.chartingInitiated &&
-                <View style={styles.innerContainer}>
+                <View style={styles.innerContainer} ref={this.resultsRef}>
                     <br></br>
                     <Text style={styles.titleText2}>
                         Emotional Progression Charts
@@ -534,6 +551,7 @@ class ProgressionPage extends Component {
             }
             {this.state.chartingInitiated && this.state.nothingToShow && !this.state.chartingFailed &&
             <View>
+              {this.scrollToLoading()}
               <br></br>
               <br></br>
               <Text style={styles.text}>

@@ -143,10 +143,16 @@ class LandingSwitchingPage extends Component {
                   // onChange={handleAlignment}
               >
                   <ToggleButton value="progression" onClick={this.toggleClickProgression}>
+                    <View>
                       <Image style={styles.image} source={require('../assets/images/chart.jpg')} />
+                      <Text>Click Me</Text>
+                    </View>
                   </ToggleButton>
                   <ToggleButton value="search" onClick={this.toggleClickSearch}>
+                    <View>
                       <Image style={styles.image} source={require('../assets/images/magnifying-glass-search-icon-png-transparent.png')} />
+                      <Text>Click Me</Text>
+                    </View>
                   </ToggleButton>
                   {/*
                   <ToggleButton value="tag" onClick={this.toggleClickTag}>

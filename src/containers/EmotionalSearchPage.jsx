@@ -77,6 +77,10 @@ class EmotionalSearchPage extends Component {
     const newAnonSessionId = this.props.anonSession.anonSession
     const usernameToUse = newAnonSessionId.payload
 
+    this.resultsRef = React.createRef()
+
+    this.scrollToResults.bind(this)
+
     this.state = {
       searchInput: '',
       dateInput: this.props.defaultDate,
@@ -192,6 +196,23 @@ class EmotionalSearchPage extends Component {
       console.log('Check search in progress failed')
       this.setState({ noPreviousResults: true })
     })
+  }
+
+  scrollToLoading () {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth'
+    })
+  }
+
+  scrollToResults () {
+    if (this.resultsRef.current !== null) {
+      this.resultsRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  componentDidUpdate () {
+    this.scrollToResults()
   }
 
   handleSubmit = (e) => {
@@ -393,20 +414,20 @@ class EmotionalSearchPage extends Component {
           </View>
           <br></br>
           {!this.state.searchingInitiated &&
-            <View>
+            <View style={styles.subcontainer}>
               <br></br>
               <br></br>
               <View>
                 <Text style={styles.text}>How To Find Articles Leading Emotional Categories for any Week-long Period</Text>
               </View>
-              <View>
+              <View style={{flex:1, justifyContent: "center", alignItems: "center"}}>
               <iframe
                 width="560"
                 height="315"
                 src="https://www.youtube.com/embed/KDeo65ZMf2A"
                 title="YouTube video player"
                 frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen></iframe>
               </View>
               <br></br>
@@ -414,6 +435,7 @@ class EmotionalSearchPage extends Component {
           }
           {this.state.searchingInitiated &&
             <View>
+              {this.scrollToLoading()}
               <br></br>
               <br></br>
               <Text style={styles.text}>
@@ -436,9 +458,13 @@ class EmotionalSearchPage extends Component {
           }
 
           {!this.state.searchingInitiated && !this.state.noResultsToReturn && !this.state.noPreviousResults &&
+          <View ref={this.resultsRef}>
+            <br></br>
+            <br></br>
             <Text style={styles.text}>
               From {this.state.startDateString} To {this.state.endDateString}
             </Text>
+          </View>
           }
           <br></br>
           {this.state.noResultsToReturn && !this.state.searchingInitiated &&
