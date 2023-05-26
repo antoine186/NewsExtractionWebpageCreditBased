@@ -1,2 +1,2 @@
 
-export const testingLocally = false
+export const testingLocally = true

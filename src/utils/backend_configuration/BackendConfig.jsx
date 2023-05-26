@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// export const backendUrl = 'http://localhost:80/api'
-export const backendUrl = 'https://emomachinesbackend.xyz/api'
+export const backendUrl = 'http://localhost:80/api'
+// export const backendUrl = 'https://emomachinesbackend.xyz/api'
 export const loginAuthUrl = '/auth-login'
 export const sessionAuthUrl = '/session-validate'
 export const searchUrl = '/search'

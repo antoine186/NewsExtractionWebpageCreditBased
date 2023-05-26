@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, Icon, Image } from
 import CappedDatePicker from '../components/atoms/CappedDatePicker'
 import styles from '../utils/style_guide/MainWebpageStyle'
 import PropTypes from 'prop-types'
-import { api, searchUrl, getPreviousSearchResult, createCheckout, checkStillSearching } from '../utils/backend_configuration/BackendConfig'
+import { api, searchUrl, getPreviousSearchResult, createCheckout, checkStillSearching, twitterSearch } from '../utils/backend_configuration/BackendConfig'
 import DateFormatter from '../utils/DateFormatter'
 import SearchArticlesResultTable from '../components/molecules/SearchArticlesResultTable'
 import ArticlesResultTableDataWrangler from './search_helper_functions/ArticlesResultTableDataWrangler'
@@ -28,51 +28,6 @@ function Link (props) {
 class EmotionalSearchPage extends Component {
   constructor (props) {
     super(props)
-
-    /*
-    let usernameToUse = ''
-
-    if (CheckEmptyObject(this.props.anonSession.anonSession)) {
-      usernameToUse = 'antoine186@hotmail.com'
-
-      const newAnonSessionId = GenerateRandomString(15)
-
-      const payload = {
-        firstName: newAnonSessionId,
-        lastName: newAnonSessionId,
-        emailAddress: newAnonSessionId,
-        password: newAnonSessionId,
-        dateBirth: new Date(),
-        telephoneNumber: newAnonSessionId,
-        telephoneAreaCode: newAnonSessionId,
-        selectedCountryName: newAnonSessionId,
-        selectedCountryCode: newAnonSessionId,
-        selectedStateCode: newAnonSessionId,
-        selectedStateName: newAnonSessionId,
-        selectedCityName: newAnonSessionId,
-        addressLine1: newAnonSessionId,
-        addressLine2: newAnonSessionId,
-        zipCode: newAnonSessionId
-      }
-
-      api.post(basicAccountCreateUrl, {
-        accountCreationData: payload
-      }, {
-        withCredentials: true
-      }
-      ).then(response => {
-        if (response.data.operation_success) {
-          // this.props.setAccountData(accountCreationData)
-          this.props.setAnonSession(newAnonSessionId)
-        } else {
-          this.forceUpdate()
-        }
-      }
-      )
-    } else {
-      const newAnonSessionId = this.props.anonSession.anonSession
-      usernameToUse = newAnonSessionId.payload
-    } */
 
     const newAnonSessionId = this.props.anonSession.anonSession
     const usernameToUse = newAnonSessionId.payload
@@ -306,7 +261,7 @@ class EmotionalSearchPage extends Component {
           })
         }, oneSecond * 60)
 
-        this.props.setSearchTimeoutState(currentTimeout)
+      this.props.setSearchTimeoutState(currentTimeout)
     })
   }
 
@@ -378,6 +333,7 @@ class EmotionalSearchPage extends Component {
       <View style={styles.subcontainer}>
           <Text style={styles.text}>Credit only valid for your session. Please spend within 2 hours and do not clear browser cookies.</Text>
           <Text style={styles.text}>For support, please email antoine.tian@emomachines.xyz</Text>
+
         <View style={styles.innerContainer}>
           <View class="form-group form-row">
             <View class="col-10">
@@ -401,7 +357,7 @@ class EmotionalSearchPage extends Component {
                 </TouchableOpacity>
               }
               {!this.state.searchingInitiated && this.props.creditData !== undefined &&
-                <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined? 0 : ProcessCredits(this.props.creditData.creditData)}</Text>
+                <Text style={styles.text}>Credits: ${this.props.creditData.creditData === undefined ? 0 : ProcessCredits(this.props.creditData.creditData)}</Text>
               }
               {!this.state.searchingInitiated &&
               <View>
@@ -420,7 +376,7 @@ class EmotionalSearchPage extends Component {
               <View>
                 <Text style={styles.text}>How To Find Articles Leading Emotional Categories for any Week-long Period</Text>
               </View>
-              <View style={{flex:1, justifyContent: "center", alignItems: "center"}}>
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
               <iframe
                 width="560"
                 height="315"

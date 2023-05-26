@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import EmotionalSearchPage from './EmotionalSearchPage'
+import SearchFunctionSwitchingPage from './SearchFunctionSwitchingPage'
 import TopBar from '../components/molecules/TopBar'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
@@ -166,7 +166,7 @@ class LandingSwitchingPage extends Component {
                   */}
               </ToggleButtonGroup>
               {this.state.searchShow &&
-                <EmotionalSearchPage />
+                <SearchFunctionSwitchingPage />
               }
               {this.state.tagShow &&
                 <TaggingPage />
