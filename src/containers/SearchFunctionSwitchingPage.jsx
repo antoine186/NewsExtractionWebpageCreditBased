@@ -4,7 +4,7 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Icon, Image } from 'react-native'
 import styles from '../utils/style_guide/MainWebpageStyle'
-import TwitterSearchPage from './TwitterSearchPage'
+// import TwitterSearchPage from './TwitterSearchPage'
 
 class SearchFunctionSwitchingPage extends Component {
   constructor (props) {
